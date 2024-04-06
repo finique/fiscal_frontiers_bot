@@ -1,5 +1,5 @@
 from neon_db import retrieve_stock_data, create_stock_tables
-from fmp_api import get_peers_multiples
+from fmp_api import get_peers_multiples, get_stock_data
 from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable
 from market_report import how_is_acceleration, how_is_curve, how_is_twist
 from types_of_multiples import leverage_solvency, valuation, cashflow_dividend, profitability_performance, liquidity_efficiency
@@ -22,7 +22,7 @@ app = Flask(__name__)
 matplotlib.use('Agg')
 
 load_dotenv()
-BOT_TOKEN = os.getenv('TG_BOT_TOKEN')
+BOT_TOKEN = os.getenv('Tg_BOT_TOKEN')
 WEBHOOK_URL = 'https://tg-test-test-7be248118a5c.herokuapp.com'  # Your Heroku app's URL
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -124,8 +124,7 @@ def handle_price(message):
 
 def analyze_price(ticker, chat_id):
     ticker = ticker.strip().upper()
-    create_stock_tables(ticker,1,1)
-    data_df = retrieve_stock_data(ticker,1)  # Assuming this function fetches the required data
+    data_df = get_stock_data(ticker)  # Assuming this function fetches the required data
     
     if data_df is not None and not data_df.empty:
         plt.figure(figsize=(10, 6))
