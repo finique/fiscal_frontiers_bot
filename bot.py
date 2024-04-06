@@ -147,6 +147,7 @@ def analyze_price(ticker, chat_id):
         # Send the plot
         bot.send_photo(chat_id, photo=buffer)
         plt.close()  # Close the plot to free up memory
+        del data_df
 
     else:
         bot.send_message(chat_id, "Sorry, I couldn't fetch data for that ticker. Please try again.")
@@ -172,6 +173,7 @@ def analyze_multiples(ticker, chat_id, m_type):
 
         bot.send_photo(chat_id, photo=buffer)
         plt.close()
+        del data_df
     else:
         bot.send_message(chat_id, "Sorry, there was a problem with the multiples analysis.")
 
@@ -187,6 +189,7 @@ def analyze_yield(chat_id):
     # Send the plot
     bot.send_photo(chat_id, photo=buffer)
     plt.close()  # Close the plot to free up memory
+    del yield_curve
 
 
 
