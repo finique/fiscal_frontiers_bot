@@ -112,7 +112,7 @@ def perform_analysis_multiples(message):
 def handle_price(message):
     user_id = message.from_user.id
     if user_id in user_tickers and user_tickers[user_id]:
-        print('Choose:\n /clean_price \n\n /moving_avg \n\n /st_deviation')
+        bot.reply_to(message,'Choose:\n /clean_price \n\n /moving_avg \n\n /st_deviation')
     else:
         bot.reply_to(message, "Please /set_ticker first.")
 

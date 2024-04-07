@@ -162,18 +162,20 @@ def graph_tech_optimized(df, ticker='Ticker'):
         temp_df = df[df['date'] >= start_date] if period != 'All time' else df
         for column in temp_df.columns[1:]:
             if '+2StDev' in column:
-                ax.fill_between(temp_df['date'], temp_df[column], temp_df[temp_df.columns[temp_df.columns.get_loc(column)+1]], color='lightblue', alpha=0.5, label='StDev Band')
+                ax.fill_between(temp_df['date'], temp_df[column], temp_df[temp_df.columns[temp_df.columns.get_loc(column)+1]], color='lightblue', alpha=0.5, label='+/-2 StDev')
             elif 'close' in column:
                 ax.plot(temp_df['date'], temp_df[column], label=column, color='black')
             elif '-2StDev' in column:
                 continue
             else:
                 ax.plot(temp_df['date'], temp_df[column], label=column, linewidth=0.6)
-        ax.set_title(f'Technicals for {ticker} for {period}', fontsize=8)
-        ax.legend(fontsize=6)
-        ax.tick_params(axis='y', labelsize=6)
-        ax.tick_params(axis='x', labelsize=6)
+        ax.set_title(f'Technicals for {ticker} ({period})', fontsize=8)
+        ax.legend(fontsize=7)
+        ax.tick_params(axis='y', labelsize=7)
+        ax.tick_params(axis='x', labelsize=7)
         ax.xaxis.set_major_locator(plt.MaxNLocator(5))
+        ax.grid(True)
+
     plt.tight_layout()
     plt.subplots_adjust(wspace=0.25, hspace=0.25)
     buffer = io.BytesIO()
