@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 
@@ -101,3 +101,51 @@ def get_yield(offset, key = api_key):
 #yield_curve1
 # offset is the amount of last months to get data for
 #yield_curve1.T.columns = pd.to_datetime(yield_curve1.T.columns)
+
+
+def get_indicators (ticker, indicators, periods):
+    start_date=datetime.today() - timedelta(days=5000)
+    end_date=datetime.today()
+    api_key=os.getenv('Fmp_api_key')
+    base_url = "https://financialmodelingprep.com/api/v3/technical_indicator/1day"
+    df_main = pd.DataFrame()
+    close_extracted = False
+
+    # Format start_date and end_date as strings in 'YYYY-MM-DD' format
+    start_date_str = start_date.strftime('%Y-%m-%d')
+    end_date_str = end_date.strftime('%Y-%m-%d')
+    
+    for indicator, period in zip(indicators, periods):
+        params = {
+            "apikey": api_key,
+            "type": indicator,
+            "period": period,
+            "from": start_date_str,
+            "to": end_date_str,
+        }
+        response = requests.get(f"{base_url}/{ticker}", params=params)
+        
+        if response.status_code == 200:
+            df = pd.DataFrame(response.json())
+            df['date'] = pd.to_datetime(df['date'])
+            
+            if not close_extracted:
+                df_main = df[['date', 'close']].copy()
+                close_extracted = True
+                
+            indicator_label = f"{indicator}{period}"  # e.g., "ema10"
+            df.rename(columns={indicator: indicator_label}, inplace=True)
+            df_main = pd.merge(df_main, df[['date', indicator_label]], on='date', how='left')
+        else:
+            print(f"Failed to retrieve data for {indicator}{period}")
+
+    if indicators[0] == 'standardDeviation':
+      df_main['+2StDev ({})'.format(period)] = df_main['close'] + 2 * df_main['standardDeviation{}'.format(period)]
+      df_main['-2StDev ({})'.format(period)] = df_main['close'] - 2 * df_main['standardDeviation{}'.format(period)]
+      df_main.drop(columns=['standardDeviation{}'.format(period)], inplace=True)
+    else: 
+      pass
+
+    return df_main
+
+

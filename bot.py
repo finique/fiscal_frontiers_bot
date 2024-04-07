@@ -1,6 +1,6 @@
-from neon_db import retrieve_stock_data, create_stock_tables
-from fmp_api import get_peers_multiples, get_stock_data
-from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable
+#from neon_db import retrieve_stock_data, create_stock_tables
+from fmp_api import get_peers_multiples, get_stock_data, get_indicators
+from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized
 from market_report import how_is_acceleration, how_is_curve, how_is_twist
 from types_of_multiples import leverage_solvency, valuation, cashflow_dividend, profitability_performance, liquidity_efficiency
 
@@ -108,10 +108,16 @@ def perform_analysis_multiples(message):
     else:
         bot.reply_to(message, "Invalid analysis type. Please choose a valid analysis command.")
 
-
+@bot.message_handler(commands=['price'])
+def handle_price(message):
+    user_id = message.from_user.id
+    if user_id in user_tickers and user_tickers[user_id]:
+        print('Choose:\n /clean_price \n\n /moving_avg \n\n /st_deviation')
+    else:
+        bot.reply_to(message, "Please /set_ticker first.")
 
 # Analysis command handlers
-@bot.message_handler(commands=['price'])
+@bot.message_handler(commands=['clean_price'])
 def handle_price(message):
     user_id = message.from_user.id
     if user_id in user_tickers and user_tickers[user_id]:
@@ -119,6 +125,28 @@ def handle_price(message):
         analyze_price(ticker, message.chat.id)
     else:
         bot.reply_to(message, "Please /set_ticker first.")
+
+
+# Analysis command handlers
+@bot.message_handler(commands=['moving_avg'])
+def handle_price(message):
+    user_id = message.from_user.id
+    if user_id in user_tickers and user_tickers[user_id]:
+        ticker = user_tickers[user_id]
+        tech_analysis(message.chat.id, ticker, ["ema", "ema", "ema"] , [10,50,200])
+    else:
+        bot.reply_to(message, "Please /set_ticker first.")
+
+# Analysis command handlers
+@bot.message_handler(commands=['st_deviation'])
+def handle_price(message):
+    user_id = message.from_user.id
+    if user_id in user_tickers and user_tickers[user_id]:
+        ticker = user_tickers[user_id]
+        tech_analysis(message.chat.id, ticker, ["standardDeviation"], [20])
+    else:
+        bot.reply_to(message, "Please /set_ticker first.")
+
 
 
 
@@ -218,6 +246,19 @@ def perform_market_analysis(chat_id):
     # Send the plot
     bot.send_photo(chat_id, photo=buffer)
     plt.close()  # Close the plot to free up memory
+
+
+# Example tech_analysis function
+def tech_analysis(chat_id, ticker, indicators, periods):
+    ticker = ticker.strip().upper()
+    df = get_indicators(ticker, indicators, periods)
+    buffer = graph_tech_optimized(df, ticker)
+    
+    # Here you would replace bot.send_photo with the appropriate method for your bot framework
+    bot.send_photo(chat_id, photo=buffer)
+    
+    buffer.close()  # Optionally close the buffer if you're done with it
+
 
 
 @app.route('/', methods=['POST'])

@@ -1,3 +1,6 @@
 .env
 __pycache__/
 *.pyc
+my_additional_files.zip
+package
+testing.py

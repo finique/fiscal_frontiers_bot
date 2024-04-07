@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.colors as mcolors
 from fmp_api import get_yield
+from datetime import datetime, timedelta
 
 def graph_peers_multiple(multiples_series, multiple):
     multiples_series = multiples_series.loc['{}'.format(multiple)]
@@ -129,7 +130,6 @@ def graph_yield(df=get_yield(offset = 3), show = 0):
 # df = get_yield(offset=3)
 # graph_yield(df=df)
 
-
 def graph_datatable(ax, df, title):
     ax.axis('tight')
     ax.axis('off')
@@ -137,3 +137,48 @@ def graph_datatable(ax, df, title):
     table.auto_set_font_size(False)
     table.set_fontsize(5)
     ax.set_title(title)
+
+
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+import io  # For BytesIO
+
+# Modified graph_tech_optimized function from before
+def graph_tech_optimized(df, ticker='Ticker'):
+    df['date'] = pd.to_datetime(df['date'])
+    current_date = datetime.today()
+    periods = {
+        'All time': pd.Timestamp.min,
+        '1 year': current_date - timedelta(days=365),
+        '6 months': current_date - timedelta(days=180),
+        '3 months': current_date - timedelta(days=90),
+    }
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10, 8))
+    axes = axes.flatten()
+    for ax, (period, start_date) in zip(axes, periods.items()):
+        temp_df = df[df['date'] >= start_date] if period != 'All time' else df
+        for column in temp_df.columns[1:]:
+            if '+2StDev' in column:
+                ax.fill_between(temp_df['date'], temp_df[column], temp_df[temp_df.columns[temp_df.columns.get_loc(column)+1]], color='lightblue', alpha=0.5, label='StDev Band')
+            elif 'close' in column:
+                ax.plot(temp_df['date'], temp_df[column], label=column, color='black')
+            elif '-2StDev' in column:
+                continue
+            else:
+                ax.plot(temp_df['date'], temp_df[column], label=column, linewidth=0.6)
+        ax.set_title(f'Technicals for {ticker} for {period}', fontsize=8)
+        ax.legend(fontsize=6)
+        ax.tick_params(axis='y', labelsize=6)
+        ax.tick_params(axis='x', labelsize=6)
+        ax.xaxis.set_major_locator(plt.MaxNLocator(5))
+    plt.tight_layout()
+    plt.subplots_adjust(wspace=0.25, hspace=0.25)
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
+    buffer.seek(0)
+    plt.close()
+    return buffer
+
