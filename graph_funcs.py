@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import matplotlib.colors as mcolors
-from fmp_api import get_yield, get_commodity
+from fmp_api import get_yield, get_commodity, get_geo_seg, get_segmentation
 from datetime import datetime, timedelta
 
 
@@ -226,3 +226,31 @@ def graph_vol(asset, metric='changePercent'):
     plt.tight_layout()
     plt.subplots_adjust(wspace=0.25, hspace=0.25)
     plt.show()
+
+
+
+def graph_segmentation(ticker):
+    product_df, geo_df = get_segmentation(ticker)
+    # Filter data for the last period in each dataset
+    latest_product_date = product_df['Date'].max()
+    latest_product_data = product_df[product_df['Date'] == latest_product_date]
+
+    latest_geo_date = geo_df['Date'].max()
+    latest_geo_data = geo_df[geo_df['Date'] == latest_geo_date]
+
+    # Plotting
+    fig, ax = plt.subplots(1, 2, figsize=(14, 7))
+
+    ax[0].pie(latest_product_data['Revenue'], labels=latest_product_data['Product'], autopct='%1.1f%%')
+    ax[0].set_title(f'Product Segmentation \n{ticker} on {latest_product_date}')
+
+    ax[1].pie(latest_geo_data['Revenue'], labels=latest_geo_data['Segment'], autopct='%1.1f%%')
+    ax[1].set_title(f'Geographic Segmentation \n{ticker} on {latest_geo_date}')
+
+    plt.tight_layout()
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
+    buffer.seek(0)
+    plt.close()
+
+    return buffer

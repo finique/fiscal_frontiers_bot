@@ -182,5 +182,45 @@ def get_commodity(commodity_type, metric = 'close'):
       merged_df = pd.merge(merged_df, df, on='date', how='outer')
 
   merged_df = merged_df.rename(columns={'10-Year T-Note Futures': '10Y T-Note','E-Mini S&P 500': 'S&P500','Gold Futures': 'Gold','Brent Crude Oil': 'Brent'})
-  
+
   return merged_df
+
+
+def get_segmentation(ticker):
+    # Initialize empty DataFrames
+    product_df = pd.DataFrame(columns=["Date", "Product", "Revenue"])
+    geo_df = pd.DataFrame(columns=["Date", "Segment", "Revenue"])
+
+    # Product segmentation URL and request
+    product_url = f"https://financialmodelingprep.com/api/v4/revenue-product-segmentation?symbol={ticker}&structure=flat&period=annual&apikey={api_key}"
+    product_response = requests.get(product_url)
+    product_data = product_response.json()
+
+    # Geographic segmentation URL and request
+    geo_url = f"https://financialmodelingprep.com/api/v4/revenue-geographic-segmentation?symbol={ticker}&structure=flat&apikey={api_key}"
+    geo_response = requests.get(geo_url)
+    geo_data = geo_response.json()
+
+    # Check and process product data if not empty
+    if product_data:  # Check if the product_data list is not empty
+        product_frames = []
+        for entry in product_data:
+            date = list(entry.keys())[0]
+            for product, revenue in entry[date].items():
+                product_frames.append(pd.DataFrame({"Date": [date], "Product": [product], "Revenue": [revenue]}))
+        product_df = pd.concat(product_frames, ignore_index=True)
+
+    # Check and process geographic data if not empty
+    if geo_data:  # Check if the geo_data list is not empty
+        geo_frames = []
+        for entry in geo_data:
+            date = list(entry.keys())[0]
+            for segment, revenue in entry[date].items():
+                geo_frames.append(pd.DataFrame({"Date": [date], "Segment": [segment], "Revenue": [revenue]}))
+        geo_df = pd.concat(geo_frames, ignore_index=True)
+
+    return product_df, geo_df
+
+
+
+   

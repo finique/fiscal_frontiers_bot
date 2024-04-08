@@ -1,6 +1,6 @@
 #from neon_db import retrieve_stock_data, create_stock_tables
 from fmp_api import get_peers_multiples, get_stock_data, get_indicators
-from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized
+from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation
 from market_report import how_is_acceleration, how_is_curve, how_is_twist, how_commod, how_commod_volatility
 from types_of_multiples import leverage_solvency, valuation, cashflow_dividend, profitability_performance, liquidity_efficiency
 
@@ -40,7 +40,7 @@ def send_welcome(message):
     msg_to_pin = bot.send_message(message.chat.id, pin_message)
     bot.pin_chat_message(message.chat.id, msg_to_pin.message_id, disable_notification=False)
 
-    bot.reply_to(message, "Welcome! \n\nPlease use: /set_ticker  \n\n/yields \n\n/commodities \n\nto begin analysis.")
+    bot.reply_to(message, "Welcome! \n\nPlease use: \n\n/set_ticker  \n\n/yields \n\n/commodities \n\nto begin analysis.")
 
 
 
@@ -59,12 +59,11 @@ def market_analysis_handler(message):
     perform_commod_analysis(message.chat.id)
 
 
-
 #############################################
 
 @bot.message_handler(commands=['yields'])
 def market_analysis_handler(message):
-    bot.reply_to(message, "Would you like /yield_graph or /yield_report")
+    bot.reply_to(message, "Choose: \n\n/yield_graph \n\n /yield_report")
 
 @bot.message_handler(commands=['yield_graph'])
 def market_analysis_handler(message):
@@ -73,7 +72,6 @@ def market_analysis_handler(message):
 @bot.message_handler(commands=['yield_report'])
 def market_analysis_handler(message):
     perform_market_analysis(message.chat.id)
-
 
 
 #############################################
@@ -88,7 +86,7 @@ def command_set_ticker(message):
 def handle_ticker_input(message):
     if not message.text.startswith('/'):  # This ensures we're not interpreting commands as tickers
         user_tickers[message.from_user.id] = message.text.upper().strip()
-        bot.reply_to(message, f"Ticker set to {user_tickers[message.from_user.id]}. You can now use analysis commands like /price or /multiples to analyse.")
+        bot.reply_to(message, f"Ticker set to {user_tickers[message.from_user.id]}. \nYou can now use commands: \n\n/price \n\n/multiples \n\n/geo_prod_segmentation.")
     else:
         bot.reply_to(message, "It seems you've entered a command. To set a ticker, please directly type the ticker symbol.")
 
@@ -129,6 +127,19 @@ def perform_analysis_multiples(message):
     else:
         bot.reply_to(message, "Invalid analysis type. Please choose a valid analysis command.")
 
+#############################################
+
+@bot.message_handler(commands=['geo_prod_segmentation'])
+def handle_segmentation(message):
+    user_id = message.from_user.id
+    if user_id in user_tickers and user_tickers[user_id]:
+        ticker = user_tickers[user_id]
+        send_segmentation(message.chat.id, ticker)
+    else:
+        bot.reply_to(message, "Please /set_ticker first.")
+
+#############################################
+
 @bot.message_handler(commands=['price'])
 def handle_price(message):
     user_id = message.from_user.id
@@ -141,7 +152,7 @@ def handle_price(message):
 
 # Analysis command handlers
 @bot.message_handler(commands=['clean_price'])
-def handle_price(message):
+def handle_clean_price(message):
     user_id = message.from_user.id
     if user_id in user_tickers and user_tickers[user_id]:
         ticker = user_tickers[user_id]
@@ -151,7 +162,7 @@ def handle_price(message):
 
 # Analysis command handlers
 @bot.message_handler(commands=['moving_avg'])
-def handle_price(message):
+def handle_ema(message):
     user_id = message.from_user.id
     if user_id in user_tickers and user_tickers[user_id]:
         ticker = user_tickers[user_id]
@@ -161,7 +172,7 @@ def handle_price(message):
 
 # Analysis command handlers
 @bot.message_handler(commands=['st_deviation'])
-def handle_price(message):
+def handle_stdev(message):
     user_id = message.from_user.id
     if user_id in user_tickers and user_tickers[user_id]:
         ticker = user_tickers[user_id]
@@ -308,6 +319,14 @@ def tech_analysis(chat_id, ticker, indicators, periods):
     buffer.close()  # Optionally close the buffer if you're done with it
 
 
+def send_segmentation(chat_id, ticker):
+    ticker = ticker.strip().upper()
+    buffer = graph_segmentation(ticker)
+    
+    # Here you would replace bot.send_photo with the appropriate method for your bot framework
+    bot.send_photo(chat_id, photo=buffer)
+    
+    buffer.close()  # Optionally close the buffer if you're done with it
 
 @app.route('/', methods=['POST'])
 def receive_update():
