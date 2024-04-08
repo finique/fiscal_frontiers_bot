@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from fmp_api import get_yield
+from fmp_api import get_yield, get_commodity
+from commodity_types import agricultural_commodities, energy_commodities, metals_commodities, other_commodities, fixed_income_commodities, currencies_indices_commodities, main_commodities
 
 def round_up_to_2_decimals(series):
     return np.ceil(series * 100) / 100
@@ -151,3 +152,69 @@ def how_is_acceleration(df = get_yield(offset = 3)):
     return results_df
 
 
+
+# COMMODITIES
+
+
+def how_commod(metric):
+    df = get_commodity(main_commodities, metric)
+
+    # Initialize empty DataFrames for storing results
+    results = pd.DataFrame(columns=['Last 1 week', 'Last 1 month', 'Last 6 months', 'All-time'])
+
+    df['date'] = pd.to_datetime(df['date'])
+    df = df.set_index('date')
+
+    time_periods = {
+        'Last 1 week': '1W',  # 1 week
+        'Last 1 month': '1ME',  # 1 month
+        'Last 6 months': '6ME',  # 6 months
+        'All-time': 'All'  # All-time (no resampling needed)
+    }
+
+    for period, freq in time_periods.items():
+        if freq == 'All':
+            period_data = df
+        else:
+            period_data = df.resample(freq).mean()
+
+        if metric == 'volume':
+            results[period] = period_data.mean() / 1000  # Convert to thousands
+        elif metric == 'changePercent':
+            results[period] = period_data.mean()
+
+    # Optionally, you can return the DataFrames if needed
+    return round_up_to_2_decimals(results).T
+
+#print(analyse_commod('volume'))
+
+
+def how_commod_volatility():
+    df = get_commodity(main_commodities, 'changePercent')
+    df['date'] = pd.to_datetime(df['date'])
+    df = df.set_index('date')
+
+    # Assuming "today" is the maximum date in your DataFrame for this example
+    now = df.index.max()
+
+    # Define periods for volatility analysis
+    periods = {
+        'Last 1 week': now - pd.Timedelta(weeks=1),
+        'Last 1 month': now - pd.Timedelta(days=30),  # Approximating a month with 30 days
+        'Last 6 months': now - pd.Timedelta(days=6*30),  # Approximating a month with 30 days
+        'All-time': df.index.min()
+    }
+
+    # Initialize an empty DataFrame for volatility results
+    volatility_results_df = pd.DataFrame(index=periods.keys(), columns=df.columns)
+
+    for commodity in df.columns:  # Include all commodity columns
+        for period, start_date in periods.items():
+            period_df = df.loc[start_date:, commodity]
+            volatility = period_df.std()
+            volatility_results_df.at[period, commodity] = volatility
+
+    return round_up_to_2_decimals(volatility_results_df)
+
+
+#analyse_commod_volatility()

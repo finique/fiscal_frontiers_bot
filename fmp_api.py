@@ -106,7 +106,6 @@ def get_yield(offset, key = api_key):
 def get_indicators (ticker, indicators, periods):
     start_date=datetime.today() - timedelta(days=5000)
     end_date=datetime.today()
-    api_key=os.getenv('Fmp_api_key')
     base_url = "https://financialmodelingprep.com/api/v3/technical_indicator/1day"
     df_main = pd.DataFrame()
     close_extracted = False
@@ -149,3 +148,37 @@ def get_indicators (ticker, indicators, periods):
     return df_main
 
 
+
+import pandas as pd
+
+# Function to fetch commodity data
+def fetch_commodity_data(symbol, name, metric):
+    url = f"https://financialmodelingprep.com/api/v3/historical-price-full/{symbol}"
+    params = {'apikey': api_key}
+    response = requests.get(url, params=params)
+    if response.status_code == 200:  # Success
+        data = response.json()
+        # Extracting date and close columns
+        df = pd.DataFrame(data['historical'])
+        df = df[['date', '{}'.format(metric)]]
+        # Renaming close column to include commodity name
+        df.rename(columns={'{}'.format(metric): '{}'.format(name)}, inplace=True)
+        return df
+    else:
+        print(f"Failed to fetch data for {symbol}")
+        return None
+
+
+# Fetching data for each commodity and storing in a list
+def get_commodity(commodity_type, metric = 'close'):
+  commodity_dfs = []
+  for symbol, name in commodity_type:
+      df = fetch_commodity_data(symbol, name, metric)
+      if df is not None:
+          commodity_dfs.append(df)
+
+  merged_df = commodity_dfs[0]
+  for df in commodity_dfs[1:]:
+      merged_df = pd.merge(merged_df, df, on='date', how='outer')
+
+  return merged_df

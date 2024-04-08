@@ -1,7 +1,7 @@
 #from neon_db import retrieve_stock_data, create_stock_tables
 from fmp_api import get_peers_multiples, get_stock_data, get_indicators
 from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized
-from market_report import how_is_acceleration, how_is_curve, how_is_twist
+from market_report import how_is_acceleration, how_is_curve, how_is_twist, how_commod, how_commod_volatility
 from types_of_multiples import leverage_solvency, valuation, cashflow_dividend, profitability_performance, liquidity_efficiency
 
 
@@ -40,21 +40,43 @@ def send_welcome(message):
     msg_to_pin = bot.send_message(message.chat.id, pin_message)
     bot.pin_chat_message(message.chat.id, msg_to_pin.message_id, disable_notification=False)
 
-    bot.reply_to(message, "Welcome! \nPlease use /set_ticker or \n/market_analysis to begin analysis.")
+    bot.reply_to(message, "Welcome! \nPlease use /set_ticker or \n/yields or \n/commodities to begin analysis.")
 
 
-@bot.message_handler(commands=['market_analysis'])
+
+#############################################
+
+@bot.message_handler(commands=['commodities'])
 def market_analysis_handler(message):
-    bot.reply_to(message, "Would you like /yield_curve or /yield_dynamics")
+    bot.reply_to(message, "Would you like /commodities_graph or /commodities_report")
+
+#@bot.message_handler(commands=['commodities_graph'])
+#def market_analysis_handler(message):
+#    analyze_yield(message.chat.id)
+
+@bot.message_handler(commands=['commodities_report'])
+def market_analysis_handler(message):
+    perform_commod_analysis(message.chat.id)
 
 
-@bot.message_handler(commands=['yield_curve'])
+
+#############################################
+
+@bot.message_handler(commands=['yields'])
+def market_analysis_handler(message):
+    bot.reply_to(message, "Would you like /yield_graph or /yield_report")
+
+@bot.message_handler(commands=['yield_graph'])
 def market_analysis_handler(message):
     analyze_yield(message.chat.id)
 
-@bot.message_handler(commands=['yield_dynamics'])
+@bot.message_handler(commands=['yield_report'])
 def market_analysis_handler(message):
     perform_market_analysis(message.chat.id)
+
+
+
+#############################################
 
 # Command to manually set or change the ticker
 @bot.message_handler(commands=['set_ticker'])
@@ -69,7 +91,6 @@ def handle_ticker_input(message):
         bot.reply_to(message, f"Ticker set to {user_tickers[message.from_user.id]}. You can now use analysis commands like /price or /multiples to analyse.")
     else:
         bot.reply_to(message, "It seems you've entered a command. To set a ticker, please directly type the ticker symbol.")
-
 
 
 # Multiples' command
@@ -112,9 +133,11 @@ def perform_analysis_multiples(message):
 def handle_price(message):
     user_id = message.from_user.id
     if user_id in user_tickers and user_tickers[user_id]:
-        bot.reply_to(message,'Choose:\n /clean_price \n\n /moving_avg \n\n /st_deviation')
+        bot.reply_to(message,'Choose:\n\n /clean_price \n\n /moving_avg \n\n /st_deviation')
     else:
         bot.reply_to(message, "Please /set_ticker first.")
+
+
 
 # Analysis command handlers
 @bot.message_handler(commands=['clean_price'])
@@ -125,7 +148,6 @@ def handle_price(message):
         analyze_price(ticker, message.chat.id)
     else:
         bot.reply_to(message, "Please /set_ticker first.")
-
 
 # Analysis command handlers
 @bot.message_handler(commands=['moving_avg'])
@@ -147,8 +169,7 @@ def handle_price(message):
     else:
         bot.reply_to(message, "Please /set_ticker first.")
 
-
-
+#############################################
 
 def analyze_price(ticker, chat_id):
     ticker = ticker.strip().upper()
@@ -234,6 +255,33 @@ def perform_market_analysis(chat_id):
     graph_datatable(axes[0], acceleration_df, 'Acceleration Avg(Month)')
     graph_datatable(axes[1], twist_df, 'Major Twists - Thresh: 5%')
     graph_datatable(axes[2], curve_df, 'Latest Dynamic')
+
+    # Adjust layout
+    plt.subplots_adjust(hspace=0.5)  # Reduce the vertical space between rows
+    
+    # Save the plot as a PNG file in memory
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', pad_inches=0.1, dpi=300)
+    buffer.seek(0)
+
+    # Send the plot
+    bot.send_photo(chat_id, photo=buffer)
+    plt.close()  # Close the plot to free up memory
+
+
+def perform_commod_analysis(chat_id):
+    # Call each analysis function and gather outputs
+    fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(5, 4))  # Adjust the figure size as needed
+    
+    # Example DataFrames
+    commod_volume = how_commod('changePercent').reset_index()
+    commod_ret = how_commod('volume').reset_index()
+    commod_stdev = how_commod_volatility().reset_index()
+
+    # Plot DataFrames in a grid layout
+    graph_datatable(axes[0], commod_ret, 'Avg Returns %')
+    graph_datatable(axes[1], commod_stdev, 'Avg Volatility')
+    graph_datatable(axes[2], commod_volume, "Avg Volume ('000)")
 
     # Adjust layout
     plt.subplots_adjust(hspace=0.5)  # Reduce the vertical space between rows

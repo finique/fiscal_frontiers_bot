@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-import numpy as np
 import matplotlib.colors as mcolors
-from fmp_api import get_yield
+from fmp_api import get_yield, get_commodity
 from datetime import datetime, timedelta
+
 
 def graph_peers_multiple(multiples_series, multiple):
     multiples_series = multiples_series.loc['{}'.format(multiple)]
@@ -139,11 +139,6 @@ def graph_datatable(ax, df, title):
     ax.set_title(title)
 
 
-
-
-import pandas as pd
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
 import io  # For BytesIO
 
 # Modified graph_tech_optimized function from before
@@ -184,3 +179,52 @@ def graph_tech_optimized(df, ticker='Ticker'):
     plt.close()
     return buffer
 
+
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+import pandas as pd
+
+def graph_vol(asset, metric='changePercent'):
+    # Mapping period strings to corresponding timedelta values
+    periods = {
+        'All time': timedelta.max,
+        '1 year': timedelta(days=365),
+        '6 months': timedelta(days=180),
+        '3 months': timedelta(days=90)
+    }
+
+    # Your code to get commodity data, assuming get_commodity is defined elsewhere
+    preped_df = get_commodity(asset, metric).apply(lambda x: x**2 if x.name != 'date' else x)
+
+    # Convert date column to datetime
+    preped_df['date'] = pd.to_datetime(preped_df['date'])
+
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10, 8))
+    axes = axes.flatten()
+    
+    for ax, (period, delta) in zip(axes, periods.items()):
+        end_date = datetime.now()
+        if period != 'All time':
+            start_date = end_date - delta
+        else:
+            start_date = preped_df['date'].min() # For 'All time', start from the earliest date in the data
+        temp_df = preped_df[(preped_df['date'] >= start_date) & (preped_df['date'] <= end_date)]
+
+        for commodity in temp_df.columns[1:]:
+            ax.plot(temp_df['date'], temp_df[commodity], label=commodity, linewidth=0.6)
+
+        ax.set_title(f'r^2 ({period})', fontsize=8)
+        ax.legend(fontsize=7)
+        ax.tick_params(axis='y', labelsize=7)
+        ax.tick_params(axis='x', labelsize=7)
+        
+        num_dates = 5  # Number of dates to display
+        num_points = len(temp_df['date'])
+        step = num_points // num_dates
+        ax.set_xticks(temp_df['date'][::step])
+        
+        ax.grid(True)
+
+    plt.tight_layout()
+    plt.subplots_adjust(wspace=0.25, hspace=0.25)
+    plt.show()
