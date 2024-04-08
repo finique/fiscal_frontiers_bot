@@ -180,9 +180,7 @@ def graph_tech_optimized(df, ticker='Ticker'):
     return buffer
 
 
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-import pandas as pd
+
 
 def graph_vol(asset, metric='changePercent'):
     # Mapping period strings to corresponding timedelta values

@@ -40,7 +40,7 @@ def send_welcome(message):
     msg_to_pin = bot.send_message(message.chat.id, pin_message)
     bot.pin_chat_message(message.chat.id, msg_to_pin.message_id, disable_notification=False)
 
-    bot.reply_to(message, "Welcome! \nPlease use /set_ticker or \n/yields or \n/commodities to begin analysis.")
+    bot.reply_to(message, "Welcome! \n\nPlease use: /set_ticker  \n\n/yields \n\n/commodities \n\nto begin analysis.")
 
 
 
@@ -48,7 +48,7 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['commodities'])
 def market_analysis_handler(message):
-    bot.reply_to(message, "Would you like /commodities_graph or /commodities_report")
+    bot.reply_to(message, "Choose:\n\n/commodities_graph \n\n/commodities_report")
 
 #@bot.message_handler(commands=['commodities_graph'])
 #def market_analysis_handler(message):
@@ -274,8 +274,8 @@ def perform_commod_analysis(chat_id):
     fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(5, 4))  # Adjust the figure size as needed
     
     # Example DataFrames
-    commod_volume = how_commod('changePercent').reset_index()
-    commod_ret = how_commod('volume').reset_index()
+    commod_ret = how_commod('changePercent').reset_index()
+    commod_volume = how_commod('volume').reset_index()
     commod_stdev = how_commod_volatility().reset_index()
 
     # Plot DataFrames in a grid layout

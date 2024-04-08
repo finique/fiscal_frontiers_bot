@@ -158,12 +158,12 @@ def how_is_acceleration(df = get_yield(offset = 3)):
 
 def how_commod(metric):
     df = get_commodity(main_commodities, metric)
-
     # Initialize empty DataFrames for storing results
-    results = pd.DataFrame(columns=['Last 1 week', 'Last 1 month', 'Last 6 months', 'All-time'])
+    results = pd.DataFrame(columns=['Last Day','Last 1 week', 'Last 1 month', 'Last 6 months', 'All-time'])
 
     df['date'] = pd.to_datetime(df['date'])
     df = df.set_index('date')
+    last_day_row = df.iloc[-1]
 
     time_periods = {
         'Last 1 week': '1W',  # 1 week
@@ -183,16 +183,24 @@ def how_commod(metric):
         elif metric == 'changePercent':
             results[period] = period_data.mean()
 
+    if metric == 'volume':
+        results.loc[:,'Last Day'] = last_day_row.T/1000
+    elif metric == 'changePercent':
+        results.loc[:,'Last Day'] = last_day_row.T
+    
     # Optionally, you can return the DataFrames if needed
     return round_up_to_2_decimals(results).T
 
 #print(analyse_commod('volume'))
 
 
+import pandas as pd
+
 def how_commod_volatility():
     df = get_commodity(main_commodities, 'changePercent')
     df['date'] = pd.to_datetime(df['date'])
     df = df.set_index('date')
+    last_day_row = df.iloc[-1]
 
     # Assuming "today" is the maximum date in your DataFrame for this example
     now = df.index.max()
@@ -206,15 +214,18 @@ def how_commod_volatility():
     }
 
     # Initialize an empty DataFrame for volatility results
-    volatility_results_df = pd.DataFrame(index=periods.keys(), columns=df.columns)
+    volatility_results_df = pd.DataFrame(columns=df.columns)
 
     for commodity in df.columns:  # Include all commodity columns
+        last_day_volatility = last_day_row[commodity]  # Assuming you want to show last day change percent as "volatility"
+        volatility_results_df.at['Last Day', commodity] = last_day_volatility
         for period, start_date in periods.items():
             period_df = df.loc[start_date:, commodity]
             volatility = period_df.std()
             volatility_results_df.at[period, commodity] = volatility
 
     return round_up_to_2_decimals(volatility_results_df)
+
 
 
 #analyse_commod_volatility()

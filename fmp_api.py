@@ -181,4 +181,6 @@ def get_commodity(commodity_type, metric = 'close'):
   for df in commodity_dfs[1:]:
       merged_df = pd.merge(merged_df, df, on='date', how='outer')
 
+  merged_df = merged_df.rename(columns={'10-Year T-Note Futures': '10Y T-Note','E-Mini S&P 500': 'S&P500','Gold Futures': 'Gold','Brent Crude Oil': 'Brent'})
+  
   return merged_df
