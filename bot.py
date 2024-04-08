@@ -134,6 +134,7 @@ def handle_segmentation(message):
     user_id = message.from_user.id
     if user_id in user_tickers and user_tickers[user_id]:
         ticker = user_tickers[user_id]
+        bot.send_message(message.chat.id, "This data is available not for all companies.")
         send_segmentation(message.chat.id, ticker)
     else:
         bot.reply_to(message, "Please /set_ticker first.")

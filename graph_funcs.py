@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import matplotlib.colors as mcolors
-from fmp_api import get_yield, get_commodity, get_geo_seg, get_segmentation
+from fmp_api import get_yield, get_commodity, get_segmentation
 from datetime import datetime, timedelta
 
 
