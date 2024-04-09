@@ -1,7 +1,7 @@
 #from neon_db import retrieve_stock_data, create_stock_tables
 from fmp_api import get_peers_multiples, get_stock_data, get_indicators
 from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation
-from market_report import how_is_acceleration, how_is_curve, how_is_twist, how_commod, how_commod_volatility
+from market_report import how_is_acceleration, how_is_curve, how_is_twist, how_commod_change, how_commod_volume, how_commod_volatility
 from types_of_multiples import leverage_solvency, valuation, cashflow_dividend, profitability_performance, liquidity_efficiency
 
 
@@ -14,7 +14,7 @@ import io
 import matplotlib.pyplot as plt
 import matplotlib
 
-comebacker = 'You can always: /restart'
+comebacker = 'YOU CAN ALWAYS: /restart'
 
 # Setting up Flask
 app = Flask(__name__)
@@ -134,7 +134,7 @@ def handle_segmentation(message):
     user_id = message.from_user.id
     if user_id in user_tickers and user_tickers[user_id]:
         ticker = user_tickers[user_id]
-        bot.send_message(message.chat.id, "This data is available not for all companies.")
+        bot.send_message(message.chat.id, "Data may be missing for some companies.")
         send_segmentation(message.chat.id, ticker)
     else:
         bot.reply_to(message, "Please /set_ticker first.")
@@ -286,14 +286,14 @@ def perform_commod_analysis(chat_id):
     fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(5, 4))  # Adjust the figure size as needed
     
     # Example DataFrames
-    commod_ret = how_commod('changePercent').reset_index()
-    commod_volume = how_commod('volume').reset_index()
+    commod_ret = how_commod_change().reset_index()
+    commod_volume = how_commod_volume().reset_index()
     commod_stdev = how_commod_volatility().reset_index()
 
     # Plot DataFrames in a grid layout
-    graph_datatable(axes[0], commod_ret, 'Avg Returns %')
-    graph_datatable(axes[1], commod_stdev, 'Avg Volatility')
-    graph_datatable(axes[2], commod_volume, "Avg Volume ('000)")
+    graph_datatable(axes[0], commod_ret, 'Avg Daily Returns %')
+    graph_datatable(axes[1], commod_stdev, 'Avg Daily Volatility')
+    graph_datatable(axes[2], commod_volume, "Avg Daily Volume ('000)")
 
     # Adjust layout
     plt.subplots_adjust(hspace=0.5)  # Reduce the vertical space between rows

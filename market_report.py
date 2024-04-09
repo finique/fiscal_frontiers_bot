@@ -181,7 +181,7 @@ def how_commod(metric):
         if metric == 'volume':
             results[period] = period_data.mean() / 1000  # Convert to thousands
         elif metric == 'changePercent':
-            results[period] = period_data.mean()
+            results[period] = period_data.mean()*100
 
     if metric == 'volume':
         results.loc[:,'Last Day'] = last_day_row.T/1000
@@ -194,13 +194,51 @@ def how_commod(metric):
 #print(analyse_commod('volume'))
 
 
+def how_commod_volume():
+    # Assuming 'get_commodity' is your function to retrieve commodity data
+    df = get_commodity(main_commodities, 'volume')
+    
+    last_day = df.iloc[-1, 1:]/1000
+    last_week = df.iloc[-8:, 1:].mean()/1000
+    last_month = df.iloc[-31:, 1:].mean()/1000
+    last_six_months = df.iloc[-181:, 1:].mean()/1000
+    all_time = df.iloc[:, 1:].mean()/1000
+
+    # Concatenating the slices together
+    concatenated_df = pd.concat([last_day, last_week, last_month, last_six_months, all_time], axis=1)
+
+    # Naming the columns
+    concatenated_df.columns = ['Last Day', 'Last Week', 'Last Month', 'Last 6 Months', 'All-time']
+
+    return round_up_to_2_decimals(concatenated_df.T)
+
+
+def how_commod_change():
+    # Assuming 'get_commodity' is your function to retrieve commodity data
+    df = get_commodity(main_commodities, 'changePercent')
+    
+    last_day = df.iloc[-1, 1:]
+    last_week = df.iloc[-8:, 1:].mean()
+    last_month = df.iloc[-31:, 1:].mean()
+    last_six_months = df.iloc[-181:, 1:].mean()
+    all_time = df.iloc[:, 1:].mean()
+
+    # Concatenating the slices together
+    concatenated_df = pd.concat([last_day, last_week, last_month, last_six_months, all_time], axis=1)
+
+    # Naming the columns
+    concatenated_df.columns = ['Last Day', 'Last Week', 'Last Month', 'Last 6 Months', 'All-time']
+
+    return round_up_to_2_decimals(concatenated_df.T)
+
+
+
 import pandas as pd
 
 def how_commod_volatility():
     df = get_commodity(main_commodities, 'changePercent')
     df['date'] = pd.to_datetime(df['date'])
     df = df.set_index('date')
-    last_day_row = df.iloc[-1]
 
     # Assuming "today" is the maximum date in your DataFrame for this example
     now = df.index.max()
@@ -217,8 +255,6 @@ def how_commod_volatility():
     volatility_results_df = pd.DataFrame(columns=df.columns)
 
     for commodity in df.columns:  # Include all commodity columns
-        last_day_volatility = last_day_row[commodity]  # Assuming you want to show last day change percent as "volatility"
-        volatility_results_df.at['Last Day', commodity] = last_day_volatility
         for period, start_date in periods.items():
             period_df = df.loc[start_date:, commodity]
             volatility = period_df.std()
