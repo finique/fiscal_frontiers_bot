@@ -153,45 +153,7 @@ def how_is_acceleration(df = get_yield(offset = 3)):
 
 
 
-# COMMODITIES
-
-
-def how_commod(metric):
-    df = get_commodity(main_commodities, metric)
-    # Initialize empty DataFrames for storing results
-    results = pd.DataFrame(columns=['Last Day','Last 1 week', 'Last 1 month', 'Last 6 months', 'All-time'])
-
-    df['date'] = pd.to_datetime(df['date'])
-    df = df.set_index('date')
-    last_day_row = df.iloc[-1]
-
-    time_periods = {
-        'Last 1 week': '1W',  # 1 week
-        'Last 1 month': '1ME',  # 1 month
-        'Last 6 months': '6ME',  # 6 months
-        'All-time': 'All'  # All-time (no resampling needed)
-    }
-
-    for period, freq in time_periods.items():
-        if freq == 'All':
-            period_data = df
-        else:
-            period_data = df.resample(freq).mean()
-
-        if metric == 'volume':
-            results[period] = period_data.mean() / 1000  # Convert to thousands
-        elif metric == 'changePercent':
-            results[period] = period_data.mean()*100
-
-    if metric == 'volume':
-        results.loc[:,'Last Day'] = last_day_row.T/1000
-    elif metric == 'changePercent':
-        results.loc[:,'Last Day'] = last_day_row.T
-    
-    # Optionally, you can return the DataFrames if needed
-    return round_up_to_2_decimals(results).T
-
-#print(analyse_commod('volume'))
+######################### COMMODITIES
 
 
 def how_commod_volume():
@@ -265,3 +227,7 @@ def how_commod_volatility():
 
 
 #analyse_commod_volatility()
+
+
+######################### ECON INDICATORS
+

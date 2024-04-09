@@ -1,9 +1,9 @@
 #from neon_db import retrieve_stock_data, create_stock_tables
 from fmp_api import get_peers_multiples, get_stock_data, get_indicators
-from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation
+from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation, graph_economic_indicators
 from market_report import how_is_acceleration, how_is_curve, how_is_twist, how_commod_change, how_commod_volume, how_commod_volatility
 from types_of_multiples import leverage_solvency, valuation, cashflow_dividend, profitability_performance, liquidity_efficiency
-
+from econ_types import fin_conditions, consumer, labour_market
 
 from flask import Flask, request, abort
 import telebot
@@ -40,14 +40,31 @@ def send_welcome(message):
     msg_to_pin = bot.send_message(message.chat.id, pin_message)
     bot.pin_chat_message(message.chat.id, msg_to_pin.message_id, disable_notification=False)
 
-    bot.reply_to(message, "Welcome! \n\nPlease use: \n\n/set_ticker  \n\n/yields \n\n/commodities \n\nto begin analysis.")
-
+    bot.reply_to(message, "Welcome! \n\nPlease use: \n\n/equity  \n\n/yields \n\n/commodities \n\n/economics \n\nto begin analysis.")
 
 
 #############################################
 
+@bot.message_handler(commands=['economics'])
+def market_analysis_econ(message):
+    bot.reply_to(message, "Choose:\n\n/fin_conditions \n\n/labour_market \n\n/consumer")
+    
+@bot.message_handler(commands=['fin_conditions'])
+def market_analysis_econ_fin(message):
+    analyse_econ(message.chat.id, fin_conditions)
+
+@bot.message_handler(commands=['labour_market'])
+def market_analysis_econ_cons(message):
+    analyse_econ(message.chat.id, consumer)
+
+@bot.message_handler(commands=['consumer'])
+def market_analysis_econ(message):
+    analyse_econ(message.chat.id, labour_market)
+
+#############################################
+
 @bot.message_handler(commands=['commodities'])
-def market_analysis_handler(message):
+def market_analysis_commodity(message):
     bot.reply_to(message, "Choose:\n\n/commodities_graph \n\n/commodities_report")
 
 #@bot.message_handler(commands=['commodities_graph'])
@@ -55,29 +72,29 @@ def market_analysis_handler(message):
 #    analyze_yield(message.chat.id)
 
 @bot.message_handler(commands=['commodities_report'])
-def market_analysis_handler(message):
+def market_analysis_commodity_report(message):
     perform_commod_analysis(message.chat.id)
 
 
 #############################################
 
 @bot.message_handler(commands=['yields'])
-def market_analysis_handler(message):
+def market_analysis_yield(message):
     bot.reply_to(message, "Choose: \n\n/yield_graph \n\n /yield_report")
 
 @bot.message_handler(commands=['yield_graph'])
-def market_analysis_handler(message):
+def market_analysis_yield_graph(message):
     analyze_yield(message.chat.id)
 
 @bot.message_handler(commands=['yield_report'])
-def market_analysis_handler(message):
+def market_analysis_yueld_report(message):
     perform_market_analysis(message.chat.id)
 
 
 #############################################
 
 # Command to manually set or change the ticker
-@bot.message_handler(commands=['set_ticker'])
+@bot.message_handler(commands=['equity'])
 def command_set_ticker(message):
     msg = bot.reply_to(message, "Please provide a ticker. \nExample: 'AAPL' for Apple Inc.")
     bot.register_next_step_handler(msg, handle_ticker_input)
@@ -328,6 +345,13 @@ def send_segmentation(chat_id, ticker):
     bot.send_photo(chat_id, photo=buffer)
     
     buffer.close()  # Optionally close the buffer if you're done with it
+
+def analyse_econ(chat_id, type):
+    buffer = graph_economic_indicators(type)
+    # Here you would replace bot.send_photo with the appropriate method for your bot framework
+    bot.send_photo(chat_id, photo=buffer)
+    buffer.close()  # Optionally close the buffer if you're done with it
+
 
 @app.route('/', methods=['POST'])
 def receive_update():

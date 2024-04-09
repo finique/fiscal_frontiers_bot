@@ -222,5 +222,18 @@ def get_segmentation(ticker):
     return product_df, geo_df
 
 
-
    
+def get_economics(variable):
+        """Getting the current quote of the company."""
+        URL = 'https://financialmodelingprep.com/api/v4/economic?name='
+        try:
+            r = requests.get('{}{}&apikey={}'.format(URL,variable, api_key))
+            quote = pd.DataFrame.from_dict(r.json()).transpose()
+            quote = quote.T
+            quote['date'] = pd.to_datetime(quote['date'])
+            quote.set_index('date', inplace = True)
+            quote.rename(columns={"value":"{}".format(variable)}, inplace = True)
+
+            return quote
+        except requests.exceptions.HTTPError as e:
+            print('Requesting quote estimate ERROR: ', str(e))

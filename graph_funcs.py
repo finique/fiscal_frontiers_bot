@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import matplotlib.colors as mcolors
-from fmp_api import get_yield, get_commodity, get_segmentation
+from fmp_api import get_yield, get_commodity, get_segmentation, get_economics
 from datetime import datetime, timedelta
 
 
@@ -181,7 +181,7 @@ def graph_tech_optimized(df, ticker='Ticker'):
 
 
 
-
+######################!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#########################
 def graph_vol(asset, metric='changePercent'):
     # Mapping period strings to corresponding timedelta values
     periods = {
@@ -248,6 +248,48 @@ def graph_segmentation(ticker):
     ax[1].set_title(f'Geographic Segmentation \n{ticker} on {latest_geo_date}')
 
     plt.tight_layout()
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
+    buffer.seek(0)
+    plt.close()
+
+    return buffer
+
+
+def calculate_subplot_grid_size(num_indicators):
+    if num_indicators <= 2:
+        return 1, num_indicators
+    elif num_indicators == 3:
+        return 2, 2
+    else:  # For 4 indicators
+        return 2, 2
+
+
+def graph_economic_indicators(indicators):
+    num_indicators = len(indicators)
+    nrows, ncols = calculate_subplot_grid_size(num_indicators)
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10, 8))
+    axes = axes.flatten()  # Flatten the 2D array of axes for easy iteration
+    
+    # Plot each indicator on its subplot
+    for i, indicator in enumerate(indicators):
+        if i < len(axes):  # Check to avoid index error if fewer indicators than subplots
+            data = get_economics(indicator)
+            ax = axes[i]
+            ax.plot(data.index, data[indicator], label=indicator)
+            ax.set_title(f'{indicator}', fontsize=8)
+            ax.legend(fontsize=7)
+            ax.tick_params(axis='y', labelsize=7)
+            ax.tick_params(axis='x', labelsize=7, rotation=45)
+            ax.xaxis.set_major_locator(plt.MaxNLocator(6))
+            ax.grid(True)
+    
+    # Hide unused subplots if indicators are fewer than subplots
+    for j in range(i + 1, len(axes)):
+        axes[j].axis('off')
+    
+    plt.tight_layout()
+    plt.subplots_adjust(wspace=0.25, hspace=0.25)
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
     buffer.seek(0)
