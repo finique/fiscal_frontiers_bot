@@ -77,19 +77,19 @@ def market_analysis_commodity_graph(message):
 
 @bot.message_handler(commands=['main_commodities'])
 def market_analysis_commodity_graph(message):
-    send_comm_ret(main_commodities)
+    send_comm_ret(message, main_commodities)
 
 @bot.message_handler(commands=['metals_commodities'])
 def market_analysis_commodity_graph(message):
-    send_comm_ret(metals_commodities)
+    send_comm_ret(message,metals_commodities)
 
 @bot.message_handler(commands=['agricultural_commodities'])
 def market_analysis_commodity_graph(message):
-    send_comm_ret(agricultural_commodities)
+    send_comm_ret(message, agricultural_commodities)
 
 @bot.message_handler(commands=['energy_commodities'])
 def market_analysis_commodity_graph(message):
-    send_comm_ret(energy_commodities)
+    send_comm_ret(message, energy_commodities)
 
 
 
