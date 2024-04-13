@@ -215,7 +215,7 @@ def graph_comm_returns(asset, metric='close'):
         base_prices = temp_df.iloc[0][1:]  # Base prices from the first row after filtering by date
         for commodity in temp_df.columns[1:]:
             temp_df[f'returns_{commodity}'] = (temp_df[commodity] / base_prices[commodity] - 1) * 100
-            ax.plot(temp_df['date'], temp_df[f'returns_{commodity}'], label=commodity, linewidth=1.5)
+            ax.plot(temp_df['date'], temp_df[f'returns_{commodity}'], label=commodity, linewidth=1.2)
 
         ax.set_title(f'Simple Returns for ({period})', fontsize=8)
         ax.legend(fontsize=8)
