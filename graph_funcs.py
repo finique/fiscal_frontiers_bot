@@ -183,6 +183,7 @@ def graph_tech_optimized(df, ticker='Ticker'):
 
 ######################!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#########################
 
+
 def graph_comm_returns(asset, metric='close'):
     # Define dynamic start dates for each selected period based on today's date
     today = datetime.now()
@@ -214,9 +215,9 @@ def graph_comm_returns(asset, metric='close'):
         base_prices = temp_df.iloc[0][1:]  # Base prices from the first row after filtering by date
         for commodity in temp_df.columns[1:]:
             temp_df[f'returns_{commodity}'] = (temp_df[commodity] / base_prices[commodity] - 1) * 100
-            ax.plot(temp_df['date'], temp_df[f'returns_{commodity}'], label=commodity, linewidth=0.6)
+            ax.plot(temp_df['date'], temp_df[f'returns_{commodity}'], label=commodity, linewidth=2.5)
 
-        ax.set_title(f'Simle Returns for ({period})', fontsize=8)
+        ax.set_title(f'Simple Returns for ({period})', fontsize=8)
         ax.legend(fontsize=7)
         ax.tick_params(axis='both', which='major', labelsize=7)
 
@@ -225,7 +226,7 @@ def graph_comm_returns(asset, metric='close'):
         ax.grid(True)
 
     plt.tight_layout()
-    #plt.subplots_adjust(wspace=0.25, hspace=0.35)  # Adjust spacing to avoid label overlap
+    plt.subplots_adjust(wspace=0.25, hspace=0.35)  # Adjust spacing to avoid label overlap
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
     buffer.seek(0)
