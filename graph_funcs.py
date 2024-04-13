@@ -226,7 +226,7 @@ def graph_comm_returns(asset, metric='close'):
         ax.grid(True)
 
     plt.tight_layout()
-    plt.subplots_adjust(wspace=0.25, hspace=0.35)  # Adjust spacing to avoid label overlap
+    plt.subplots_adjust(wspace=0.25, hspace=0.25)  # Adjust spacing to avoid label overlap
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
     buffer.seek(0)
