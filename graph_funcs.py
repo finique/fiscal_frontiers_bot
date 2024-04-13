@@ -188,9 +188,9 @@ def graph_comm_returns(asset, metric='close'):
     today = datetime.now()
     dates = {
         '1 week': today - timedelta(days=7),
-        '3 months': today - timedelta(months=90),
-        '6 months': today - timedelta(months=180),
-        '1 year': today - timedelta(years=365)
+        '3 months': today - timedelta(days=90),
+        '6 months': today - timedelta(days=180),
+        '1 year': today - timedelta(days=365)
     }
 
     # Fetch and preprocess commodity data
