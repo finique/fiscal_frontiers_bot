@@ -169,6 +169,8 @@ def fetch_commodity_data(symbol, name, metric):
         return None
 
 
+
+
 # Fetching data for each commodity and storing in a list
 def get_commodity(commodity_type, metric = 'close'):
   commodity_dfs = []

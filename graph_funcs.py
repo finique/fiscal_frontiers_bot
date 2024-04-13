@@ -182,56 +182,54 @@ def graph_tech_optimized(df, ticker='Ticker'):
 
 
 ######################!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#########################
-import pandas as pd
-import matplotlib.pyplot as plt
-from datetime import datetime
 
-def graph_comm_returns(asset, metric='changePercent'):
-    # Hardcoded start dates for each selected period
+def graph_comm_returns(asset, metric='close'):
+    # Define dynamic start dates for each selected period based on today's date
+    today = datetime.now()
     dates = {
-        '1 week': '2023-04-01',
-        '3 months': '2023-01-01',
-        '6 months': '2022-10-01',
-        '1 year': '2022-04-01'
+        '1 week': today - DateOffset(weeks=1),
+        '3 months': today - DateOffset(months=3),
+        '6 months': today - DateOffset(months=6),
+        '1 year': today - DateOffset(years=1)
     }
 
-    # Assume get_commodity is defined elsewhere to fetch and preprocess commodity data
-    preped_df = get_commodity(asset, metric)  # Fetch data with a predefined metric
-
-    # Calculate returns
-    preped_df = preped_df.pct_change().dropna()  # Convert to percentage changes and remove NA values
-
-    # Convert date column to datetime
+    # Fetch and preprocess commodity data
+    preped_df = get_commodity(asset, metric)  # Assume this function is defined elsewhere
     preped_df['date'] = pd.to_datetime(preped_df['date'])
+    preped_df.sort_values('date', inplace=True)  # Ensure data is sorted by date
+
+    # Fill missing data
+    preped_df.fillna(method='ffill', inplace=True)  # Forward fill to carry last observation forward
+    preped_df.fillna(method='bfill', inplace=True)  # Backward fill to handle any initial NaNs
 
     # Setting up subplots grid
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 10))  # Adjust the subplot grid as needed
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 10))
     axes = axes.flatten()
 
     for ax, (period, start_date) in zip(axes, dates.items()):
-        start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date = datetime.now()  # Current date for the end date
-        temp_df = preped_df[(preped_df['date'] >= start_date) & (preped_df['date'] <= end_date)]
+        # Filter data for the relevant date range
+        temp_df = preped_df[(preped_df['date'] >= start_date) & (preped_df['date'] <= today)].copy()
 
+        # Calculate base returns for each commodity
+        base_prices = temp_df.iloc[0][1:]  # Base prices from the first row after filtering by date
         for commodity in temp_df.columns[1:]:
-            ax.plot(temp_df['date'], temp_df[commodity], label=commodity, linewidth=0.6)
+            temp_df[f'returns_{commodity}'] = (temp_df[commodity] / base_prices[commodity] - 1) * 100
+            ax.plot(temp_df['date'], temp_df[f'returns_{commodity}'], label=commodity, linewidth=0.6)
 
-        ax.set_title(f'{metric} Returns ({period})', fontsize=8)
+        ax.set_title(f'Simle Returns for ({period})', fontsize=8)
         ax.legend(fontsize=7)
         ax.tick_params(axis='both', which='major', labelsize=7)
-        
-        # Improving date tick formatting for readability
+
+        # Set major locator for x-axis to improve readability
         ax.xaxis.set_major_locator(plt.MaxNLocator(5))
-        
         ax.grid(True)
 
     plt.tight_layout()
-    plt.subplots_adjust(wspace=0.25, hspace=0.35)  # Adjust spacing to avoid label overlap
+    #plt.subplots_adjust(wspace=0.25, hspace=0.35)  # Adjust spacing to avoid label overlap
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
     buffer.seek(0)
     plt.close()
-
     return buffer
 
 
