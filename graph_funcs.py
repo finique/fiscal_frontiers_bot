@@ -187,10 +187,10 @@ def graph_comm_returns(asset, metric='close'):
     # Define dynamic start dates for each selected period based on today's date
     today = datetime.now()
     dates = {
-        '1 week': today - DateOffset(weeks=1),
-        '3 months': today - DateOffset(months=3),
-        '6 months': today - DateOffset(months=6),
-        '1 year': today - DateOffset(years=1)
+        '1 week': today - timedelta(days=7),
+        '3 months': today - timedelta(months=90),
+        '6 months': today - timedelta(months=180),
+        '1 year': today - timedelta(years=365)
     }
 
     # Fetch and preprocess commodity data
