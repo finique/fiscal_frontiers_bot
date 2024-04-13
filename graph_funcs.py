@@ -182,50 +182,58 @@ def graph_tech_optimized(df, ticker='Ticker'):
 
 
 ######################!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#########################
-def graph_vol(asset, metric='changePercent'):
-    # Mapping period strings to corresponding timedelta values
-    periods = {
-        'All time': timedelta.max,
-        '1 year': timedelta(days=365),
-        '6 months': timedelta(days=180),
-        '3 months': timedelta(days=90)
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+def graph_comm_returns(asset, metric='changePercent'):
+    # Hardcoded start dates for each selected period
+    dates = {
+        '1 week': '2023-04-01',
+        '3 months': '2023-01-01',
+        '6 months': '2022-10-01',
+        '1 year': '2022-04-01'
     }
 
-    # Your code to get commodity data, assuming get_commodity is defined elsewhere
-    preped_df = get_commodity(asset, metric).apply(lambda x: x**2 if x.name != 'date' else x)
+    # Assume get_commodity is defined elsewhere to fetch and preprocess commodity data
+    preped_df = get_commodity(asset, metric)  # Fetch data with a predefined metric
+
+    # Calculate returns
+    preped_df = preped_df.pct_change().dropna()  # Convert to percentage changes and remove NA values
 
     # Convert date column to datetime
     preped_df['date'] = pd.to_datetime(preped_df['date'])
 
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10, 8))
+    # Setting up subplots grid
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 10))  # Adjust the subplot grid as needed
     axes = axes.flatten()
-    
-    for ax, (period, delta) in zip(axes, periods.items()):
-        end_date = datetime.now()
-        if period != 'All time':
-            start_date = end_date - delta
-        else:
-            start_date = preped_df['date'].min() # For 'All time', start from the earliest date in the data
+
+    for ax, (period, start_date) in zip(axes, dates.items()):
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = datetime.now()  # Current date for the end date
         temp_df = preped_df[(preped_df['date'] >= start_date) & (preped_df['date'] <= end_date)]
 
         for commodity in temp_df.columns[1:]:
             ax.plot(temp_df['date'], temp_df[commodity], label=commodity, linewidth=0.6)
 
-        ax.set_title(f'r^2 ({period})', fontsize=8)
+        ax.set_title(f'{metric} Returns ({period})', fontsize=8)
         ax.legend(fontsize=7)
-        ax.tick_params(axis='y', labelsize=7)
-        ax.tick_params(axis='x', labelsize=7)
+        ax.tick_params(axis='both', which='major', labelsize=7)
         
-        num_dates = 5  # Number of dates to display
-        num_points = len(temp_df['date'])
-        step = num_points // num_dates
-        ax.set_xticks(temp_df['date'][::step])
+        # Improving date tick formatting for readability
+        ax.xaxis.set_major_locator(plt.MaxNLocator(5))
         
         ax.grid(True)
 
     plt.tight_layout()
-    plt.subplots_adjust(wspace=0.25, hspace=0.25)
-    plt.show()
+    plt.subplots_adjust(wspace=0.25, hspace=0.35)  # Adjust spacing to avoid label overlap
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
+    buffer.seek(0)
+    plt.close()
+
+    return buffer
+
 
 
 
@@ -280,8 +288,8 @@ def graph_economic_indicators(indicators):
             ax.set_title(f'{indicator}', fontsize=8)
             ax.legend(fontsize=7)
             ax.tick_params(axis='y', labelsize=7)
-            ax.tick_params(axis='x', labelsize=7, rotation=45)
-            ax.xaxis.set_major_locator(plt.MaxNLocator(6))
+            ax.tick_params(axis='x', labelsize=7)
+            ax.xaxis.set_major_locator(plt.MaxNLocator(5))
             ax.grid(True)
     
     # Hide unused subplots if indicators are fewer than subplots

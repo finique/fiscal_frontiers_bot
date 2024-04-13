@@ -1,9 +1,10 @@
 #from neon_db import retrieve_stock_data, create_stock_tables
 from fmp_api import get_peers_multiples, get_stock_data, get_indicators
-from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation, graph_economic_indicators
+from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation, graph_economic_indicators, graph_comm_returns
 from market_report import how_is_acceleration, how_is_curve, how_is_twist, how_commod_change, how_commod_volume, how_commod_volatility
 from types_of_multiples import leverage_solvency, valuation, cashflow_dividend, profitability_performance, liquidity_efficiency
 from econ_types import fin_conditions, consumer, labour_market
+from commodity_types import main_commodities, metals_commodities, agricultural_commodities, energy_commodities
 
 from flask import Flask, request, abort
 import telebot
@@ -67,9 +68,32 @@ def market_analysis_econ(message):
 def market_analysis_commodity(message):
     bot.reply_to(message, "Choose:\n\n/commodities_graph \n\n/commodities_report")
 
-#@bot.message_handler(commands=['commodities_graph'])
-#def market_analysis_handler(message):
-#    analyze_yield(message.chat.id)
+
+
+
+@bot.message_handler(commands=['commodities_graph'])
+def market_analysis_commodity_graph(message):
+    bot.reply_to(message, "Choose:\n\n/main_commodities \n\n/commodities_report")
+
+@bot.message_handler(commands=['main_commodities'])
+def market_analysis_commodity_graph(message):
+    graph_comm_returns(asset = main_commodities)
+
+@bot.message_handler(commands=['metals_commodities'])
+def market_analysis_commodity_graph(message):
+    graph_comm_returns(metals_commodities)
+
+@bot.message_handler(commands=['agricultural_commodities'])
+def market_analysis_commodity_graph(message):
+    graph_comm_returns(agricultural_commodities)
+
+@bot.message_handler(commands=['agricultural_commodities'])
+def market_analysis_commodity_graph(message):
+    graph_comm_returns(energy_commodities)
+
+
+
+
 
 @bot.message_handler(commands=['commodities_report'])
 def market_analysis_commodity_report(message):
@@ -330,6 +354,15 @@ def tech_analysis(chat_id, ticker, indicators, periods):
     ticker = ticker.strip().upper()
     df = get_indicators(ticker, indicators, periods)
     buffer = graph_tech_optimized(df, ticker)
+    
+    # Here you would replace bot.send_photo with the appropriate method for your bot framework
+    bot.send_photo(chat_id, photo=buffer)
+    
+    buffer.close()  # Optionally close the buffer if you're done with it
+
+def send_comm_ret(chat_id, asset):
+
+    buffer = graph_comm_returns(asset)
     
     # Here you would replace bot.send_photo with the appropriate method for your bot framework
     bot.send_photo(chat_id, photo=buffer)
