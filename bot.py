@@ -104,7 +104,7 @@ def market_analysis_commodity_report(message):
 
 @bot.message_handler(commands=['yields'])
 def market_analysis_yield(message):
-    bot.reply_to(message, "Choose: \n\n/yield_graph \n\n /yield_report")
+    bot.reply_to(message, "Choose: \n\n/yield_graph \n\n/yield_report")
 
 @bot.message_handler(commands=['yield_graph'])
 def market_analysis_yield_graph(message):
