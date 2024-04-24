@@ -51,7 +51,7 @@ def market_analysis_econ(message):
     bot.reply_to(message, "Choose:\n\n/fin_conditions \n\n/labour_market \n\n/consumer \n\nOr try: /calendar_1W")
 
 
-@bot.message_handler(commands=['calendar_1W'])
+@bot.message_handler(commands=['calendar1W'])
 def market_analysis_calendar_report(message):
     perform_calendar(message.chat.id)
 
@@ -391,6 +391,16 @@ def analyse_econ(chat_id, type):
     buffer.close()  # Optionally close the buffer if you're done with it
 
 
+def perform_calendar(chat_id):
+    graph_calendar_table(get_calendar_1W())
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
+    buffer.seek(0)
+
+    # Send the plot
+    bot.send_photo(chat_id, photo=buffer)
+    plt.close()  # Close the plot to free up memory
+
 @app.route('/', methods=['POST'])
 def receive_update():
     if request.headers.get('content-type') == 'application/json':
@@ -400,6 +410,7 @@ def receive_update():
         return '', 200
     else:
         return abort(403)
+
 
 # Start the Flask server
 if __name__ == '__main__':
@@ -413,13 +424,3 @@ if __name__ == '__main__':
 ########
 
 
-def perform_calendar(chat_id):
-
-    graph_calendar_table(get_calendar_1W)
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
-    buffer.seek(0)
-
-    # Send the plot
-    bot.send_photo(chat_id, photo=buffer)
-    plt.close()  # Close the plot to free up memory
