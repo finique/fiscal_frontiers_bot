@@ -48,7 +48,7 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['economics'])
 def market_analysis_econ(message):
-    bot.reply_to(message, "Choose:\n\n/fin_conditions \n\n/labour_market \n\n/consumer \n\nOr try: /calendar_1W")
+    bot.reply_to(message, "Choose:\n\n/fin_conditions \n\n/labour_market \n\n/consumer \n\nOr try: /calendar1W")
 
 
 @bot.message_handler(commands=['calendar1W'])
@@ -392,14 +392,9 @@ def analyse_econ(chat_id, type):
 
 
 def perform_calendar(chat_id):
-    graph_calendar_table(get_calendar_1W())
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
-    buffer.seek(0)
-
+    buffer = graph_calendar_table(get_calendar_1W())
     # Send the plot
     bot.send_photo(chat_id, photo=buffer)
-    plt.close()  # Close the plot to free up memory
 
 @app.route('/', methods=['POST'])
 def receive_update():

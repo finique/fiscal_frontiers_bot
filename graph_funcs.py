@@ -330,3 +330,9 @@ def graph_calendar_table(calendar_data):
             cell._text.set_position((100, 0))  # Indent the text slightly from the very left
 
     ax.set_title('High Impact Events - US (Week ahead)')
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
+    buffer.seek(0)
+    plt.close()
+
+    return buffer
