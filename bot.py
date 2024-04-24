@@ -1,6 +1,6 @@
 #from neon_db import retrieve_stock_data, create_stock_tables
-from fmp_api import get_peers_multiples, get_stock_data, get_indicators
-from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation, graph_economic_indicators, graph_comm_returns
+from fmp_api import get_peers_multiples, get_stock_data, get_indicators, get_calendar_1W
+from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation, graph_economic_indicators, graph_comm_returns, graph_calendar_table
 from market_report import how_is_acceleration, how_is_curve, how_is_twist, how_commod_change, how_commod_volume, how_commod_volatility
 from types_of_multiples import leverage_solvency, valuation, cashflow_dividend, profitability_performance, liquidity_efficiency
 from econ_types import fin_conditions, consumer, labour_market
@@ -48,18 +48,23 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['economics'])
 def market_analysis_econ(message):
-    bot.reply_to(message, "Choose:\n\n/fin_conditions \n\n/labour_market \n\n/consumer")
-    
+    bot.reply_to(message, "Choose:\n\n/fin_conditions \n\n/labour_market \n\n/consumer \n\nOr try: /calendar_1W")
+
+
+@bot.message_handler(commands=['calendar_1W'])
+def market_analysis_calendar_report(message):
+    perform_calendar(message.chat.id)
+
 @bot.message_handler(commands=['fin_conditions'])
 def market_analysis_econ_fin(message):
     analyse_econ(message.chat.id, fin_conditions)
 
 @bot.message_handler(commands=['labour_market'])
-def market_analysis_econ_cons(message):
+def market_analysis_econ_lab(message):
     analyse_econ(message.chat.id, consumer)
 
 @bot.message_handler(commands=['consumer'])
-def market_analysis_econ(message):
+def market_analysis_econ_cons(message):
     analyse_econ(message.chat.id, labour_market)
 
 #############################################
@@ -401,3 +406,20 @@ if __name__ == '__main__':
     bot.remove_webhook()  # Remove previous webhook if any
     bot.set_webhook(url=WEBHOOK_URL)  # Set new webhook URL
     app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))  # Start Flask server
+
+
+
+
+########
+
+
+def perform_calendar(chat_id):
+
+    graph_calendar_table(get_calendar_1W)
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
+    buffer.seek(0)
+
+    # Send the plot
+    bot.send_photo(chat_id, photo=buffer)
+    plt.close()  # Close the plot to free up memory

@@ -303,3 +303,30 @@ def graph_economic_indicators(indicators):
     plt.close()
 
     return buffer
+
+
+
+
+#########
+
+
+def graph_calendar_table(calendar_data):
+    """Plot the economic calendar data as a table using Matplotlib."""
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.axis('tight')
+    ax.axis('off')
+    table = ax.table(cellText=calendar_data.values,
+                     colLabels=calendar_data.columns,
+                     cellLoc='center',
+                     loc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(8)  # Adjust the font size as desired
+
+    # Adjusting alignment of the last column (assuming it's the rightmost column)
+    last_col_idx = len(calendar_data.columns) - 1
+    for key, cell in table._cells.items():
+        if key[0] != 0 and key[1] == last_col_idx:
+            cell.set_text_props(ha='left', ma='left')  # Align text to the left
+            cell._text.set_position((100, 0))  # Indent the text slightly from the very left
+
+    ax.set_title('High Impact Events - US (Week ahead)')

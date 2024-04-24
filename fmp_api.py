@@ -223,7 +223,7 @@ def get_segmentation(ticker):
 
     return product_df, geo_df
 
-
+##################################
    
 def get_economics(variable):
         """Getting the current quote of the company."""
@@ -239,3 +239,36 @@ def get_economics(variable):
             return quote
         except requests.exceptions.HTTPError as e:
             print('Requesting quote estimate ERROR: ', str(e))
+
+
+
+##################################
+
+
+
+def get_calendar_1W():
+    """Getting the economic calendar for the next month."""
+    today = datetime.now().date().strftime("%Y-%m-%d")
+    offset_today = (datetime.now().date() + relativedelta(weeks=1)).strftime("%Y-%m-%d")
+
+    URL = 'https://financialmodelingprep.com/api/v3/economic_calendar?from={}&to={}&apikey={}'.format(today, offset_today, api_key)
+    try:
+        r = requests.get(URL)
+        r.raise_for_status()  # This checks for HTTPError.
+        data = r.json()
+        if data:  # Check if data is not empty
+            calendar = pd.DataFrame(data)
+            calendar['date'] = pd.to_datetime(calendar['date'])
+            calendar.set_index('date', inplace=True)
+            # Filter the calendar DataFrame based on 'impact' and 'country' columns
+            calendar_high_us = calendar[(calendar['impact'] == 'High') & (calendar['country'] == 'US')]
+            calendar_high_us.index = calendar_high_us.index + timedelta(hours=2)
+            calendar_high_us.reset_index(inplace = True)
+            calendar_high_us = calendar_high_us.sort_values(by='date', ascending=True)
+        
+            return calendar_high_us.iloc[:,[0,2]]
+        else:
+            return pd.DataFrame()  # Return an empty DataFrame if no data
+    except requests.exceptions.HTTPError as e:
+        print('Requesting economic calendar ERROR: ', str(e))
+        return None  # Return None or an empty DataFrame as per your error handling preference
