@@ -155,7 +155,7 @@ def perform_analysis_description(message):
         bot.reply_to(message, "Please /equity first.")
         return
     ticker = user_tickers[user_id]
-    analyze_description(ticker, message.chat.id)
+    analyze_earnings(ticker, message.chat.id)
 
 
 # Multiples' command
