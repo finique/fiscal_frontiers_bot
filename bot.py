@@ -142,7 +142,7 @@ def handle_ticker_input(message):
 def perform_analysis_description(message):
     user_id = message.from_user.id
     if user_id not in user_tickers or user_tickers[user_id] is None:
-        bot.reply_to(message, "Please /set_ticker first.")
+        bot.reply_to(message, "Please /equity first.")
         return
     ticker = user_tickers[user_id]
     analyze_description(ticker, message.chat.id)
@@ -172,7 +172,7 @@ multiples_analysis_types = {
 def perform_analysis_multiples(message):
     user_id = message.from_user.id
     if user_id not in user_tickers or user_tickers[user_id] is None:
-        bot.reply_to(message, "Please /set_ticker first.")
+        bot.reply_to(message, "Please /equity first.")
         return
 
     ticker = user_tickers[user_id]
