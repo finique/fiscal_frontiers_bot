@@ -22,7 +22,7 @@ def get_description(ticker):
         strings += str(f"Traded at the {item['country']} - {item['exchangeShortName']} for {item['price']}{item['currency']}\n")
         strings += str(f"Sector/Industry: {item['sector']} - {item['industry']}\n\n")
 
-        strings += str(f"MktCap: {item['mktCap']/1000000000} Billion\n")
+        strings += str(f"MktCap: {round(item['mktCap']/1000000000,2)} Billion\n")
         strings += str(f"Headcount: {item['fullTimeEmployees']}\n\n")
 
         strings += str(f"Website: {item['website']}\n\n")
@@ -59,12 +59,13 @@ def get_news(ticker, limit = 3, page = 0):
   a = response.json()
 
 
-  strings = str('Latest News for {}\n\n'.format(ticker))
+  strings = str('Latest News for {}\nOlder (↓)\n\n'.format(ticker))
+  strings += str('------------\n\n')
   for item in a:
+      strings += str(f"What: {item['title']}\n")
       strings += str(f"When: {item['publishedDate']}\n")
-      strings += str(f"Title: {item['title']}\n")
       strings += str(f"By: {item['site']}\n\n")
-      strings += str(f"Body: {item['text']}\n\n")
+      strings += str(f"{item['text']}\n\n")
       strings += str('------------\n\n')
 
   return strings
