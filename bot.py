@@ -275,7 +275,7 @@ def analyze_description(ticker, chat_id):
     ticker = ticker.strip().upper()
     description = get_description(ticker)
 
-    bot.send_message(chat_id, f"{description}")
+    bot.send_message(chat_id, 'hui')
 
 def analyze_multiples(ticker, chat_id, m_type):
     ticker = ticker.strip().upper()
