@@ -275,9 +275,8 @@ def analyze_description(ticker, chat_id):
     ticker = ticker.strip().upper()
     description = get_description(ticker)
 
-    if not description.empty:
+    if len(description)>1 :
         bot.send_message(chat_id, f"{description}")
-        
         del description
     else:
         bot.send_message(chat_id, "Sorry, there was a problem with the description.")
