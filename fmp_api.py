@@ -61,11 +61,11 @@ def get_news(ticker, limit = 3, page = 0):
 
   strings = str('Latest News for {}\n\n'.format(ticker))
   for item in a:
-      strings += str(f"Date: {item['publishedDate']}\n")
+      strings += str(f"When: {item['publishedDate']}\n")
       strings += str(f"Title: {item['title']}\n")
-      strings += str(f"Source: {item['site']}\n\n")
+      strings += str(f"By: {item['site']}\n\n")
       strings += str(f"Body: {item['text']}\n\n")
-      strings += str('------------\n\n'
+      strings += str('------------\n\n')
 
   return strings
 
