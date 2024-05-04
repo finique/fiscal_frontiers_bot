@@ -52,7 +52,7 @@ def get_earn_calendar(ticker):
   return strings
 
 
-def get_news(ticker, limit = 5, page = 0):
+def get_news(ticker, limit = 3, page = 0):
 
   url = 'https://financialmodelingprep.com/api/v3/stock_news?page={}&tickers={}&limit={}&apikey={}'.format(page, ticker, limit, api_key)
   response = requests.get(url)
@@ -65,7 +65,7 @@ def get_news(ticker, limit = 5, page = 0):
       strings += str(f"Title: {item['title']}\n")
       strings += str(f"Source: {item['site']}\n\n")
       strings += str(f"Body: {item['text']}\n\n")
-
+      strings += str('------------\n\n'
 
   return strings
 
