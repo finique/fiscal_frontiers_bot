@@ -1,5 +1,5 @@
 #from neon_db import retrieve_stock_data, create_stock_tables
-from fmp_api import get_peers_multiples, get_stock_data, get_indicators, get_calendar_1W
+from fmp_api import get_peers_multiples, get_stock_data, get_indicators, get_calendar_1W, get_description
 from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation, graph_economic_indicators, graph_comm_returns, graph_calendar_table
 from market_report import how_is_acceleration, how_is_curve, how_is_twist, how_commod_change, how_commod_volume, how_commod_volatility
 from types_of_multiples import leverage_solvency, valuation, cashflow_dividend, profitability_performance, liquidity_efficiency
@@ -137,6 +137,18 @@ def handle_ticker_input(message):
         bot.reply_to(message, "It seems you've entered a command. To set a ticker, please directly type the ticker symbol.")
 
 
+
+@bot.message_handler(commands=['/description'])
+def perform_analysis_description(message):
+    user_id = message.from_user.id
+    if user_id not in user_tickers or user_tickers[user_id] is None:
+        bot.reply_to(message, "Please /set_ticker first.")
+        return
+    ticker = user_tickers[user_id]
+    analyze_description(ticker, message.chat.id)
+
+
+
 # Multiples' command
 @bot.message_handler(commands=['multiples'])
 def perform_analysis_price(message):
@@ -259,6 +271,16 @@ def analyze_price(ticker, chat_id):
     else:
         bot.send_message(chat_id, "Sorry, I couldn't fetch data for that ticker. Please try again.")
 
+def analyze_description(ticker, chat_id):
+    ticker = ticker.strip().upper()
+    description = get_description(ticker)
+
+    if not description.empty:
+        bot.send_message(chat_id, f"{description}")
+        
+        del description
+    else:
+        bot.send_message(chat_id, "Sorry, there was a problem with the description.")
 
 def analyze_multiples(ticker, chat_id, m_type):
     ticker = ticker.strip().upper()
