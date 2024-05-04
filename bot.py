@@ -140,12 +140,7 @@ def handle_ticker_input(message):
 
 @bot.message_handler(commands=['/description'])
 def perform_analysis_description(message):
-    user_id = message.from_user.id
-    if user_id not in user_tickers or user_tickers[user_id] is None:
-        bot.reply_to(message, "Please /set_ticker first.")
-        return
-    ticker = user_tickers[user_id]
-    analyze_description(ticker, message.chat.id)
+    bot.reply_to(message, "huy")
 
 
 
@@ -271,11 +266,7 @@ def analyze_price(ticker, chat_id):
     else:
         bot.send_message(chat_id, "Sorry, I couldn't fetch data for that ticker. Please try again.")
 
-def analyze_description(ticker, chat_id):
-    ticker = ticker.strip().upper()
-    description = get_description(ticker)
 
-    bot.send_message(chat_id, 'hui')
 
 def analyze_multiples(ticker, chat_id, m_type):
     ticker = ticker.strip().upper()

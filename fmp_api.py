@@ -14,25 +14,25 @@ api_key = os.getenv('Fmp_api_key')
 
 def get_description(ticker):
 
-  url = 'https://financialmodelingprep.com/api/v3/profile/{}?apikey={}'.format(ticker, api_key)
-  response = requests.get(url)
-  a = response.json()
+    url = 'https://financialmodelingprep.com/api/v3/profile/{}?apikey={}'.format(ticker, api_key)
+    response = requests.get(url)
+    a = response.json()
 
-  strings = str('Description for {}\n\n'.format(ticker))
-  for item in a:
-    strings += str(f"Description: {item['description']}\n")
-    strings += str(f"Website: {item['website']}\n\n")
+    strings = str('Description for {}\n\n'.format(ticker))
+    for item in a:
+        strings += str(f"Description: {item['description']}\n")
+        strings += str(f"Website: {item['website']}\n\n")
 
-    strings += str(f"Traded at: {item['country']} - {item['exchangeShortName']} in {item['currency']}\n")
-    strings += str(f"Sector - Industry: {item['sector']} - {item['industry']}\n\n")
+        strings += str(f"Traded at: {item['country']} - {item['exchangeShortName']} in {item['currency']}\n")
+        strings += str(f"Sector - Industry: {item['sector']} - {item['industry']}\n\n")
 
-    strings += str(f"Price: {item['price']}\n")
-    strings += str(f"MktCap: {item['mktCap']/1000000000} Billion\n")
-    strings += str(f"Headcount: {item['fullTimeEmployees']}\n\n")
-    #strings += str(f"Price less DCF: {item['dcfDiff']}\n")
+        strings += str(f"Price: {item['price']}\n")
+        strings += str(f"MktCap: {item['mktCap']/1000000000} Billion\n")
+        strings += str(f"Headcount: {item['fullTimeEmployees']}\n\n")
+        #strings += str(f"Price less DCF: {item['dcfDiff']}\n")
 
-    strings += '\n'
-  return strings
+        strings += '\n'
+    return strings
 
 def get_stock_data(ticker):
     # API URL and Key
