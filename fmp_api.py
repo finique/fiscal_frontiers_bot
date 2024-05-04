@@ -42,17 +42,17 @@ def get_earn_calendar(ticker):
   response = requests.get(url)
   a = response.json()
 
-  strings = str('Earnings Dates for {}\n\n Future(↑)/Past(↓)'.format(ticker))
+  strings = str('Earnings Dates for {}\nFuture (↑) / Past (↓)\n\n'.format(ticker))
   for item in a[2:5]:
       strings += str(f"Date: {item['date']}\n")
       strings += str(f"Est. EPS: {item['epsEstimated']}\n")
       #strings += str(f"Est. Rev: {item['revenueEstimated']}\n")
-      strings += str(f"Period End: {item['fiscalDateEnding']}\n")
+      #strings += str(f"Period End: {item['fiscalDateEnding']}\n")
       strings += '\n'
   return strings
 
 
-def get_news(ticker, limit, page = 0):
+def get_news(ticker, limit = 5, page = 0):
 
   url = 'https://financialmodelingprep.com/api/v3/stock_news?page={}&tickers={}&limit={}&apikey={}'.format(page, ticker, limit, api_key)
   response = requests.get(url)
