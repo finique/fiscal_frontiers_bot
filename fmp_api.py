@@ -20,7 +20,7 @@ def get_description(ticker):
     strings = str('Description for {}\n\n'.format(ticker))
     for item in a:
         strings += str(f"Traded at the {item['country']} - {item['exchangeShortName']} for {item['price']}{item['currency']}\n")
-        strings += str(f"Sector/Industry: {item['sector']} - {item['industry']}\n\n")
+        strings += str(f"Operates in {item['sector']} - {item['industry']}\n\n")
 
         strings += str(f"MktCap: {round(item['mktCap']/1000000000,2)} Billion\n")
         strings += str(f"Headcount: {item['fullTimeEmployees']}\n\n")
