@@ -132,7 +132,7 @@ def command_set_ticker(message):
 def handle_ticker_input(message):
     if not message.text.startswith('/'):  # This ensures we're not interpreting commands as tickers
         user_tickers[message.from_user.id] = message.text.upper().strip()
-        bot.reply_to(message, f"Ticker set to {user_tickers[message.from_user.id]}. \nYou can now use commands: \n\n/price \n\n/multiples \n\n/geo_prod_segmentation.")
+        bot.reply_to(message, f"Ticker set to {user_tickers[message.from_user.id]}. \nYou can now use commands: \n\n/description \n\n/price \n\n/multiples \n\n/geo_prod_segmentation.")
     else:
         bot.reply_to(message, "It seems you've entered a command. To set a ticker, please directly type the ticker symbol.")
 
