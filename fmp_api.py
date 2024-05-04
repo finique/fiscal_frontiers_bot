@@ -19,11 +19,11 @@ def get_description(ticker):
 
     strings = str('Description for {}\n\n'.format(ticker))
     for item in a:
-        strings += str(f"MktCap: {item['mktCap']/1000000000} Billion\n")
-        strings += str(f"Headcount: {item['fullTimeEmployees']}\n\n")
-
         strings += str(f"Traded at the {item['country']} - {item['exchangeShortName']} for {item['price']}{item['currency']}\n")
         strings += str(f"Sector/Industry: {item['sector']} - {item['industry']}\n\n")
+
+        strings += str(f"MktCap: {item['mktCap']/1000000000} Billion\n")
+        strings += str(f"Headcount: {item['fullTimeEmployees']}\n\n")
 
         strings += str(f"Website: {item['website']}\n\n")
 
@@ -63,9 +63,8 @@ def get_news(ticker, limit = 5, page = 0):
   for item in a:
       strings += str(f"Date: {item['publishedDate']}\n")
       strings += str(f"Title: {item['title']}\n")
-      strings += str(f"Body: {item['text']}\n")
-      strings += str(f"Source: {item['site']}\n")
-      strings += '\n'
+      strings += str(f"Source: {item['site']}\n\n")
+      strings += str(f"Body: {item['text']}\n\n")
 
 
   return strings
