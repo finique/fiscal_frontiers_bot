@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import numpy as np
 from market_report import round_up_to_2_decimals
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -34,6 +35,22 @@ def get_description(ticker):
 
         strings += '\n'
     return strings
+
+
+def get_earn_calendar(ticker):
+
+  url = 'https://financialmodelingprep.com/api/v3/historical/earning_calendar/{}?apikey={}'.format(ticker, api_key)
+  response = requests.get(url)
+  a = response.json()
+
+  strings = str('Earnings Dates for {}\n\n'.format(ticker))
+  for item in a[2:5]:
+      strings += str(f"Date: {item['date']}\n")
+      strings += str(f"Est. EPS: {item['epsEstimated']}\n")
+      strings += str(f"Est. Rev: {item['revenueEstimated']}\n")
+      strings += str(f"Period End: {item['fiscalDateEnding']}\n")
+      strings += '\n'
+  return strings
 
 def get_stock_data(ticker):
     # API URL and Key
