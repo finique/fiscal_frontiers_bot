@@ -26,7 +26,7 @@ matplotlib.use('Agg')
 
 load_dotenv()
 BOT_TOKEN = os.getenv('Tg_BOT_TOKEN')
-WEBHOOK_URL = 'https://tg-test-test-7be248118a5c.herokuapp.com'  # Your Heroku app's URL
+WEBHOOK_URL = 'https://fiscal-frontiers-bot-abff41f936eb.herokuapp.com'  # Your Heroku app's URL
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
