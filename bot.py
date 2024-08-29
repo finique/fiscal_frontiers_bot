@@ -22,6 +22,8 @@ app = Flask(__name__)
 
 matplotlib.use('Agg')
 
+
+
 load_dotenv()
 BOT_TOKEN = os.getenv('Tg_BOT_TOKEN')
 WEBHOOK_URL = 'https://tg-test-test-7be248118a5c.herokuapp.com'  # Your Heroku app's URL
