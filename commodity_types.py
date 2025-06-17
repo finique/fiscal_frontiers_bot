@@ -24,7 +24,7 @@ energy_commodities = [
 metals_commodities = [
     ("HGUSD", "Copper"),
     ("SILUSD", "Micro Silver Futures"),
-    #("ALIUSD", "Aluminum Futures"),
+    # ("ALIUSD", "Aluminum Futures"),
     ("PAUSD", "Palladium"),
     #("GCUSD", "Gold Futures"),
     ("MGCUSD", "Micro Gold Futures"),

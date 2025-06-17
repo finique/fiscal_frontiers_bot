@@ -1,4 +1,4 @@
-#from neon_db import retrieve_stock_data, create_stock_tables
+# from neon_db import retrieve_stock_data, create_stock_tables
 from fmp_api import get_peers_multiples, get_stock_data, get_indicators, get_calendar_1W, get_description, get_earn_calendar, get_news
 from graph_funcs import graph_peers_multiple_by_type, graph_yield, graph_datatable, graph_tech_optimized, graph_segmentation, graph_economic_indicators, graph_comm_returns, graph_calendar_table
 from market_report import how_is_acceleration, how_is_curve, how_is_twist, how_commod_change, how_commod_volume, how_commod_volatility
